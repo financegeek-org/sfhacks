@@ -20,15 +20,9 @@ export default function Home() {
 
       {/* Main content section */}
       <main className={styles.main}>
-        <h1 className={styles.title}>QuickNFT Collection</h1>
-
-        <p className={styles.description}>For the Flow Blockchain</p>
-
+        <h1 className={styles.title}>AI Recyclers</h1>
         {/* Render the Container component conditionally if the user is logged in */}
         {loggedIn && <Container />}
-
-        {/* Render the Links component */}
-        <Links />
       </main>
     </div>
   );

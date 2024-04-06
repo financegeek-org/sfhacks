@@ -5,6 +5,6 @@ export const ACCESS_NODE_URLS = {
 }
 
 export const BLOCK_EXPLORER_URLS = {
-  'testnet': 'https://testnet.flowscan.org',
+  'testnet': 'https://testnet.flowdiver.io/',
   'mainnet': 'https://flowscan.org'
 }

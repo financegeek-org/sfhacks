@@ -71,7 +71,7 @@ export default function Container() {
     setTxMessage("");
 
     // Generate a random integer to select NFT metadata
-    const rand: number = randomInteger0To2();
+    let rand: number = randomInteger0To2();
 
     // Define an array of predefined NFT metadata
     const nftMetadata = [
@@ -80,8 +80,13 @@ export default function Container() {
         description: "NFT of our first recycling adventure",
         thumbnail: "ipfs://QmTyoWERpPpT23HypUErBvKmeeLqng5ksirSu2mwcULj8t",
       },
+      {
+        name: "Recycling 2",
+        description: "NFT of our first recycling adventure with better prompt",
+        thumbnail: "ipfs://QmTssM9CnNvqr4dNGEJeuy5WMu6ZbcyJgr26rUfScHBngi",
+      },
     ];
-
+    rand=1;
     // Execute the mintNFT transaction on the blockchain
     const transactionId = await fcl.mutate({
       cadence: MintNFT,
