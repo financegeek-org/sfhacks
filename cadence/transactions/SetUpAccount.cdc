@@ -1,6 +1,6 @@
 import NonFungibleToken from 0x631e88ae7f1d7c20
 import MetadataViews from 0x631e88ae7f1d7c20
-import QuickNFT from f8d6e0586b0a20c7
+import QuickNFT from 0x9f5d46c23ff978b5
 
 transaction {
 

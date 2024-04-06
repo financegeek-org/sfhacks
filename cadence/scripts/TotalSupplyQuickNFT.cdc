@@ -1,4 +1,4 @@
-import QuickNFT from f8d6e0586b0a20c7
+import QuickNFT from 0x9f5d46c23ff978b5
 
 pub fun main(): UInt64 {
     return QuickNFT.totalSupply;
