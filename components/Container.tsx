@@ -76,19 +76,9 @@ export default function Container() {
     // Define an array of predefined NFT metadata
     const nftMetadata = [
       {
-        name: "Quick NFT",
-        description: "Original QNFT",
-        thumbnail: "ipfs://QmYXV94RimuC3ubtyEHptTHLbh86cSRNtPuscfXmJ9jmmc",
-      },
-      {
-        name: "Quick NFT",
-        description: "Grainy QNFT",
-        thumbnail: "ipfs://QmYRvjpozSu8JE1jfnWDYXyT8VWVVYqsDUjuUwXwzPLwdq",
-      },
-      {
-        name: "Quick NFT",
-        description: "Faded QNFT",
-        thumbnail: "ipfs://QmSiswWjzwPwyW1eJvHQfd9E98DjHXovWXTggYdbFKKv8J",
+        name: "Recycling 1",
+        description: "NFT of our first recycling adventure",
+        thumbnail: "ipfs://QmTyoWERpPpT23HypUErBvKmeeLqng5ksirSu2mwcULj8t",
       },
     ];
 
