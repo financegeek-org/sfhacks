@@ -1,6 +1,6 @@
 {
 	"contracts": {
-		"HelloWorld": "cadence/contracts/HelloWorld.cdc"
+		"QuickNFT": "cadence/contracts/QuickNFT.cdc"
 	},
 	"networks": {
 		"emulator": "127.0.0.1:3569",
@@ -22,5 +22,10 @@
 				"location": "sfhacks.pkey"
 			}
 		}
-	}
+	},
+	"deployments": {
+		"testnet": {
+		  "sfhacks": ["QuickNFT"]
+		}
+	}	
 }
