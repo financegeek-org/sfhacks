@@ -1,89 +1,224 @@
-import * as fcl from '@onflow/fcl'
-import { useEffect, useState } from 'react'
-import ReadHelloWorld from '../cadence/scripts/ReadHelloWorld.cdc'
-import UpdateHelloWorld from '../cadence/transactions/UpdateHelloWorld.cdc'
-import elementStyles from '../styles/Elements.module.css'
-import containerStyles from '../styles/Container.module.css'
-import useConfig from '../hooks/useConfig'
-import { createExplorerTransactionLink } from '../helpers/links'
+// Import necessary modules and components
+import * as fcl from "@onflow/fcl"; // Flow Client Library for interacting with the blockchain
+import * as types from "@onflow/types"; // Flow types for argument types
+import useCurrentUser from "../hooks/useCurrentUser"; // Custom hook for user authentication
+import { useEffect, useState } from "react"; // React hooks for managing state
+import TotalSupplyQuickNFT from "../cadence/scripts/TotalSupplyQuickNFT.cdc"; // Cadence script to get total NFT supply
+import GetMetadataQuickNFT from "../cadence/scripts/GetMetadataQuickNFT.cdc"; // Cadence script to get NFT metadata
+import GetIDsQuickNFT from "../cadence/scripts/GetIDsQuickNFT.cdc"; // Cadence script to get NFT IDs
+import SetUpAccount from "../cadence/transactions/SetUpAccount.cdc"; // Cadence transaction to set up a user account
+import MintNFT from "../cadence/transactions/MintNFT.cdc"; // Cadence transaction to mint an NFT
+import elementStyles from "../styles/Elements.module.css"; // CSS styles for elements
+import containerStyles from "../styles/Container.module.css"; // CSS styles for containers
+import useConfig from "../hooks/useConfig"; // Custom hook for configuration
+import { createExplorerTransactionLink } from "../helpers/links"; // Helper function to create transaction links
 
+// Function to generate a random integer between 0 and 2
+function randomInteger0To2(): number {
+  return Math.floor(Math.random() * 3);
+}
+
+// Define the Container component as the default export
 export default function Container() {
-  const [chainGreeting, setChainGreeting] = useState('?')
-  const [userGreetingInput, setUserGreetingInput] = useState('')
-  const [lastTransactionId, setLastTransactionId] = useState<string>()
-  const [transactionStatus, setTransactionStatus] = useState<number>()
-  const { network } = useConfig()
+  // State variables to store data and transaction information
+  const [totalSupply, setTotalSupply] = useState(0);
+  const [datas, setDatas] = useState([]);
+  const [txMessage, setTxMessage] = useState("");
+  const [txLink, setTxLink] = useState("");
 
-  const isEmulator = network => network !== 'mainnet' && network !== 'testnet'
-  const isSealed = statusCode => statusCode === 4 // 4: 'SEALED'
+  // Custom hook to get network configuration
+  const { network } = useConfig();
 
-  useEffect(() => {
-    if (lastTransactionId) {
-      console.log('Last Transaction ID: ', lastTransactionId)
+  // Custom hook to get user authentication status
+  const user = useCurrentUser();
 
-      fcl.tx(lastTransactionId).subscribe(res => {
-        setTransactionStatus(res.statusString)
-  
-        // Query for new chain string again if status is sealed
-        if (isSealed(res.status)) {
-          queryChain()
-        }
-      })
-    }
-  }, [lastTransactionId])
-
+  // Function to query the blockchain for total NFT supply
   const queryChain = async () => {
     const res = await fcl.query({
-      cadence: ReadHelloWorld
-    })
+      cadence: TotalSupplyQuickNFT,
+    });
 
-    setChainGreeting(res)
-  }
+    setTotalSupply(res);
+  };
 
-  const mutateGreeting = async (event) => {
-    event.preventDefault()
+  // Function to handle the setup of a user account to receive NFTs
+  const mutateSetUpAccount = async (event) => {
+    event.preventDefault();
 
-    if (!userGreetingInput.length) {
-      throw new Error('Please add a new greeting string.')
+    // Reset transaction-related states
+    setTxLink("");
+    setTxMessage("");
+
+    // Execute the setUpAccount transaction on the blockchain
+    const transactionId = await fcl.mutate({
+      cadence: SetUpAccount,
+    });
+
+    // Generate a transaction link for the user to check the transaction status
+    const txLink = createExplorerTransactionLink({ network, transactionId });
+
+    // Update transaction-related states to inform the user
+    setTxLink(txLink);
+    setTxMessage("Check your setup transaction.");
+  };
+
+  // Function to handle the minting of a new NFT
+  const mutateMintNFT = async (event) => {
+    event.preventDefault();
+
+    // Reset transaction-related states
+    setTxLink("");
+    setTxMessage("");
+
+    // Generate a random integer to select NFT metadata
+    const rand: number = randomInteger0To2();
+
+    // Define an array of predefined NFT metadata
+    const nftMetadata = [
+      {
+        name: "Quick NFT",
+        description: "Original QNFT",
+        thumbnail: "ipfs://QmYXV94RimuC3ubtyEHptTHLbh86cSRNtPuscfXmJ9jmmc",
+      },
+      {
+        name: "Quick NFT",
+        description: "Grainy QNFT",
+        thumbnail: "ipfs://QmYRvjpozSu8JE1jfnWDYXyT8VWVVYqsDUjuUwXwzPLwdq",
+      },
+      {
+        name: "Quick NFT",
+        description: "Faded QNFT",
+        thumbnail: "ipfs://QmSiswWjzwPwyW1eJvHQfd9E98DjHXovWXTggYdbFKKv8J",
+      },
+    ];
+
+    // Execute the mintNFT transaction on the blockchain
+    const transactionId = await fcl.mutate({
+      cadence: MintNFT,
+      args: (arg, t) => [
+        arg(user.addr, types.Address),
+        arg(nftMetadata[rand].name, types.String),
+        arg(nftMetadata[rand].description, types.String),
+        arg(nftMetadata[rand].thumbnail, types.String),
+      ],
+    });
+
+    // Generate a transaction link for the user to check the transaction status
+    const txLink = createExplorerTransactionLink({
+      network,
+      transactionId,
+    });
+
+    // Update transaction-related states to inform the user
+    setTxLink(txLink);
+    setTxMessage("Check your NFT minting transaction.");
+
+    // Fetch the updated list of user's NFTs
+    await fetchNFTs();
+  };
+
+  // Function to fetch the user's NFTs
+  const fetchNFTs = async () => {
+    // Reset the datas state to an empty array
+    setDatas([]);
+    // Initialize an array to store NFT IDs
+    let IDs = [];
+
+    try {
+      // Query the blockchain to get the IDs of the user's owned NFTs
+      IDs = await fcl.query({
+        cadence: GetIDsQuickNFT,
+        args: (arg, t) => [arg(user.addr, types.Address)],
+      });
+    } catch (err) {
+      console.log("No NFTs Owned");
     }
 
-    const transactionId = await fcl.mutate({
-      cadence: UpdateHelloWorld,
-      args: (arg, t) => [arg(userGreetingInput, t.String)],
-    })
+    // Initialize an array to store NFT metadata
+    let _src = [];
 
-    setLastTransactionId(transactionId)
-  }
-  
-  const openExplorerLink = (transactionId, network) => window.open(createExplorerTransactionLink({ network, transactionId }), '_blank')
+    try {
+      // Iterate through each NFT ID and fetch metadata from the blockchain
+      for (let i = 0; i < IDs.length; i++) {
+        const result = await fcl.query({
+          cadence: GetMetadataQuickNFT,
+          args: (arg, t) => [
+            arg(user.addr, types.Address),
+            arg(IDs[i].toString(), types.UInt64),
+          ],
+        });
+
+        // Handle cases where the thumbnail URL is an IPFS URL
+        let imageSrc = result["thumbnail"];
+        if (result["thumbnail"].startsWith("ipfs://")) {
+          imageSrc =
+            "https://quicknode.myfilebase.com/ipfs/" + imageSrc.substring(7);
+        }
+
+        // Add NFT metadata to the _src array
+        _src.push({
+          imageUrl: imageSrc,
+          description: result["description"],
+          id: result["id"],
+        });
+      }
+
+      // Update the datas state with the fetched NFT metadata
+      setDatas(_src);
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
+  // Effect hook to fetch user's NFTs when the user is authenticated
+  useEffect(() => {
+    if (user && user.addr) {
+      fetchNFTs();
+    }
+  }, [user]);
 
   return (
     <div className={containerStyles.container}>
-      <h2>Query the Chain</h2>
       <div>
-        <button onClick={queryChain} className={elementStyles.button}>Query Greeting</button>
-        <h4>Greeting on Chain: { chainGreeting }</h4>
+        <button onClick={queryChain} className={elementStyles.button}>
+          Query Total Supply
+        </button>
+        <h4>Total Minted NFT: {totalSupply}</h4>
       </div>
       <hr />
       <div>
-        <h2>Mutate the Chain</h2>
-        {!isEmulator(network) && (
-          <h4>Latest Transaction ID: <a className={elementStyles.link} onClick={() => {openExplorerLink(lastTransactionId, network)}}>{ lastTransactionId }</a></h4>
-        )}
-        <h4>Latest Transaction Status: { transactionStatus }</h4>
-        <form onSubmit={mutateGreeting}>
-          <label>
-            <input
-              type='text'
-              placeholder='New Greeting'
-              value={userGreetingInput}
-              onChange={e => setUserGreetingInput(e.target.value)}
-              className={elementStyles.input}
-            />
-          </label>
-          <input type='submit' value='Submit' className={elementStyles.button} />
-        </form>
+        <h2>Mint Your NFT</h2>
+        <div>
+          <button onClick={mutateSetUpAccount} className={elementStyles.button}>
+            Set Up Account
+          </button>
+
+          <button onClick={mutateMintNFT} className={elementStyles.button}>
+            Mint NFT
+          </button>
+        </div>
+        <div>
+          {txMessage && (
+            <div className={elementStyles.link}>
+              <a href={txLink} target="_blank" rel="noopener noreferrer">
+                {txMessage}
+              </a>
+            </div>
+          )}
+        </div>
+      </div>
+      <hr />
+      <div>
+        <h2>Your NFTs</h2>
+        <div className={containerStyles.nftcontainer}>
+          {datas.map((item, index) => (
+            <div className={containerStyles.nft} key={index}>
+              <img src={item.imageUrl} alt={"NFT Thumbnail"} />
+              <p>{`${item.description} #${item.id}`}</p>
+            </div>
+          ))}
+        </div>
       </div>
     </div>
-  )
+  );
 }

@@ -2,3 +2,30 @@
   text-align: center;
   padding: 20px 0 50px 0;
 }
+
+.nftcontainer {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  margin: -10px;
+  /* Negative margin to offset the padding on child items */
+}
+
+/* Style each NFT item */
+.nft {
+  width: calc(20% - 20px);
+  /* Adjust the width as needed for your layout */
+  margin: 10px;
+  padding: 10px;
+  border: 1px solid #ddd;
+  text-align: center;
+}
+
+.nft img {
+  max-width: 100%;
+  height: auto;
+}
+
+.nft p {
+  margin-top: 10px;
+}
