@@ -13,14 +13,14 @@ export default function Home() {
   return (
     <div className={styles.container}>
       <Head>
-        <title>QuickNFT on Flow</title>
+        <title>AI Bears</title>
         <meta name="description" content="QuickNFT Collection" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
 
       {/* Main content section */}
       <main className={styles.main}>
-        <h1 className={styles.title}>AI Recyclers</h1>
+        <h2 className={styles.title}><img src="rilakk.png" width={50} height={50} />AI Bears for the Environment<img src="rilakk.png" width={50} height={50} /></h2>
         {/* Render the Container component conditionally if the user is logged in */}
         {loggedIn && <Container />}
       </main>

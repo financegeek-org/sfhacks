@@ -12,6 +12,40 @@ import elementStyles from "../styles/Elements.module.css"; // CSS styles for ele
 import containerStyles from "../styles/Container.module.css"; // CSS styles for containers
 import useConfig from "../hooks/useConfig"; // Custom hook for configuration
 import { createExplorerTransactionLink } from "../helpers/links"; // Helper function to create transaction links
+import {
+  FacebookShareButton,
+  InstapaperShareButton,
+  LineShareButton,
+  RedditShareButton,
+  TelegramShareButton,
+  TwitterShareButton,
+  WhatsappShareButton,
+} from "react-share";
+import {
+  EmailIcon,
+  FacebookIcon,
+  FacebookMessengerIcon,
+  GabIcon,
+  HatenaIcon,
+  InstapaperIcon,
+  LineIcon,
+  LinkedinIcon,
+  LivejournalIcon,
+  MailruIcon,
+  OKIcon,
+  PinterestIcon,
+  PocketIcon,
+  RedditIcon,
+  TelegramIcon,
+  TumblrIcon,
+  TwitterIcon,
+  ViberIcon,
+  VKIcon,
+  WeiboIcon,
+  WhatsappIcon,
+  WorkplaceIcon,
+  XIcon,
+} from "react-share";
 
 // Function to generate a random integer between 0 and 2
 function randomInteger0To2(): number {
@@ -70,11 +104,9 @@ export default function Container() {
     setTxLink("");
     setTxMessage("");
 
-    // Generate a random integer to select NFT metadata
-    let rand: number = randomInteger0To2();
-
     // Define an array of predefined NFT metadata
     const nftMetadata = [
+/*
       {
         name: "Recycling 1",
         description: "NFT of our first recycling adventure",
@@ -85,8 +117,38 @@ export default function Container() {
         description: "NFT of our first recycling adventure with better prompt",
         thumbnail: "ipfs://QmTssM9CnNvqr4dNGEJeuy5WMu6ZbcyJgr26rUfScHBngi",
       },
+*/
+      {
+        name: "Cute AI Bear 1",
+        description: "Cute AI Bear 1",
+        thumbnail: "ipfs://QmZEKmBcFnHWdRN4YwipkuuKtWiuKQUoFUfVvVJJMzp3LY",
+      },
+      {
+        name: "Cute AI Bear 2",
+        description: "Cute AI Bear 2",
+        thumbnail: "ipfs://QmTX1nMxAV2VXGqnCS1tAU7JNPCRtDEPNuL4zBRnAUNSUN",
+      },
+      {
+        name: "Cute AI Bear 3",
+        description: "Cute AI Bear 3",
+        thumbnail: "ipfs://QmfPcT7oaHRritGRjRdMMLwYeJXoQTFDN8gP5KzSypTKpY",
+      },
+/*
+      {
+        name: "Generated token 1",
+        description: "NFT of a random generated token 1",
+        thumbnail: "ipfs://QmQn7HTNUr6Hna52JNqEk47WazE1gwR87G2EJixAD6tLVX",
+      },
+      {
+        name: "Generated token 2",
+        description: "NFT of a random generated token 2",
+        thumbnail: "ipfs://QmXaUwfTACsHwDediVQtqcmiwuESfKvP8G8YakVy34q7ck",
+      },
+      */
     ];
-    rand=1;
+    // Generate a random integer to select NFT metadata
+    let rand: number = Math.floor(Math.random() * (nftMetadata.length-1));
+    rand=0;
     // Execute the mintNFT transaction on the blockchain
     const transactionId = await fcl.mutate({
       cadence: MintNFT,
@@ -175,13 +237,6 @@ export default function Container() {
   return (
     <div className={containerStyles.container}>
       <div>
-        <button onClick={queryChain} className={elementStyles.button}>
-          Query Total Supply
-        </button>
-        <h4>Total Minted NFT: {totalSupply}</h4>
-      </div>
-      <hr />
-      <div>
         <h2>Mint Your NFT</h2>
         <div>
           <button onClick={mutateSetUpAccount} className={elementStyles.button}>
@@ -210,9 +265,21 @@ export default function Container() {
             <div className={containerStyles.nft} key={index}>
               <img src={item.imageUrl} alt={"NFT Thumbnail"} />
               <p>{`${item.description} #${item.id}`}</p>
+              <p>
+                <TwitterShareButton title="AI Bears" url={item.imageUrl}><TwitterIcon size={32} round={true} /></TwitterShareButton>
+                <LineShareButton title="AI Bears" url={item.imageUrl}><LineIcon size={32} round={true} /></LineShareButton>
+                <WhatsappShareButton title="AI Bears" url={item.imageUrl}><WhatsappIcon size={32} round={true} /></WhatsappShareButton>
+              </p>
             </div>
           ))}
         </div>
+      </div>
+      <hr />
+      <div>
+        <button onClick={queryChain} className={elementStyles.button}>
+          Query Total Supply
+        </button>
+        <h4>Total Minted NFT: {totalSupply}</h4>
       </div>
     </div>
   );
